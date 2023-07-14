@@ -34,6 +34,20 @@ public class CurrencyRepository {
         }
         return list;
     }
+    public Optional<Currency> getCurrencyByCode(String code) throws SQLException {
+        try {
+            Connection con = dataSource.getConnection();
+            PreparedStatement st = con.prepareStatement("SELECT * FROM currencies WHERE code = ?");
+            st.setString(1, code);
+            st.execute();
+            ResultSet resultSet = st.getResultSet();
+            resultSet.next();
+            return Optional.of(new Currency(resultSet.getInt("id"), resultSet.getString("code"),
+                    resultSet.getString("fullName"), resultSet.getString("sign")));
+        } catch (SQLException e) {
+            return Optional.empty();
+        }
+    }
     public boolean exists(String code) throws SQLException {
         Connection con = dataSource.getConnection();
         PreparedStatement st = con.prepareStatement("SELECT * FROM currencies WHERE code = ?");

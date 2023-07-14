@@ -5,11 +5,9 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class ResponseGenerator {
-    HttpServletRequest request;
     HttpServletResponse response;
 
-    public ResponseGenerator(HttpServletRequest request, HttpServletResponse response) {
-        this.request = request;
+    public ResponseGenerator(HttpServletResponse response) {
         this.response = response;
     }
     public void notValidCurrency() throws IOException {
@@ -20,5 +18,8 @@ public class ResponseGenerator {
     }
     public void generalException() throws IOException {
         response.sendError(500, "Something wrong on our side.");
+    }
+    public void currencyNotExists() throws IOException {
+        response.sendError(404, "This currency does not exist.");
     }
 }

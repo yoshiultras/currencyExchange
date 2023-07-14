@@ -28,7 +28,7 @@ public class CurrenciesServlet extends HttpServlet {
     }
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        ResponseGenerator responseGenerator = new ResponseGenerator(request, response);
+        ResponseGenerator responseGenerator = new ResponseGenerator(response);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         Gson gson = new Gson();
@@ -46,7 +46,7 @@ public class CurrenciesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        ResponseGenerator responseGenerator = new ResponseGenerator(request, response);
+        ResponseGenerator responseGenerator = new ResponseGenerator(response);
         request.setCharacterEncoding("UTF-8");
         String code = request.getParameter("code");
         String fullName = request.getParameter("fullName");
