@@ -45,13 +45,13 @@ public class Currency {
         this.sign = sign;
     }
 
-//    @Override
-//    public String toString() {
-//        return "Currency{" +
-//                "id=" + id +
-//                ", code='" + code + '\'' +
-//                ", fullName='" + fullName + '\'' +
-//                ", sign='" + sign + '\'' +
-//                '}';
-//    }
+    @Override
+    public String toString() {
+        return "Currency{" +
+                "id=" + id +
+                ", code='" + code + '\'' +
+                ", fullName='" + fullName + '\'' +
+                ", sign='" + sign + '\'' +
+                '}';
+    }
 }
