@@ -1,7 +1,7 @@
 package com.example.servlets;
 
-import com.example.models.Currency;
-import com.example.repositories.CurrencyRepository;
+import com.example.models.ExchangeRate;
+import com.example.repositories.ExchangeRateRepository;
 import com.example.utils.ResponseGenerator;
 import com.google.gson.Gson;
 
@@ -12,45 +12,40 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.Optional;
+import java.util.List;
 
-@WebServlet("/currencies/*")
-public class CurrencyServlet extends HttpServlet {
-    CurrencyRepository currencyRepository;
+@WebServlet("/exchangeRates")
+public class ExchangeRatesServlet extends HttpServlet {
+    ExchangeRateRepository exchangeRateRepository;
+
     @Override
     public void init() {
         try {
-            currencyRepository = new CurrencyRepository();
+            exchangeRateRepository = new ExchangeRateRepository();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
-
-        String path = request.getPathInfo();
-        if (path == null || path.equals("/")) {
-            responseGenerator.currencyNotExists();
-            return;
-        }
-
-        String code = path.replaceFirst("/", "").toUpperCase();
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
         Gson gson = new Gson();
         PrintWriter out = response.getWriter();
         try {
-            Optional<Currency> optional = currencyRepository.getCurrencyByCode(code);
-            if (!optional.isPresent()) {
-                System.out.println("sdfds");
-                responseGenerator.currencyNotExists();
-                return;
+            List<ExchangeRate> list = exchangeRateRepository.getRates();
+            for (ExchangeRate exchangeRate : list) {
+                out.print(gson.toJson(exchangeRate));
             }
-            Currency currency = optional.get();
-            out.print(gson.toJson(currency));
-        } catch (Exception e) {
+        } catch (SQLException e) {
             responseGenerator.generalException();
         }
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
     }
 }

@@ -1,4 +1,4 @@
-POST http://localhost:8080/servlets_war_exploded/currencies
-Content-Type:application/x-www-form-urlencoded
-
-code=ASD&fullName=AUSTRALIAN DOLLAR&sign=A$
+GET http://localhost:8080/servlets_war_exploded/currencies/usf
+#Content-Type:application/x-www-form-urlencoded
+#
+#code=ASD&fullName=AUSTRALIAN DOLLAR&sign=A$

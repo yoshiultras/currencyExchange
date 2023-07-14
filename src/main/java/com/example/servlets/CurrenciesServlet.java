@@ -35,7 +35,6 @@ public class CurrenciesServlet extends HttpServlet {
         PrintWriter out = response.getWriter();
         try {
             List<Currency> list = currencyRepository.getCurrencies();
-            System.out.println(list.size());
             for (Currency currency : list) {
                 out.print(gson.toJson(currency));
             }
