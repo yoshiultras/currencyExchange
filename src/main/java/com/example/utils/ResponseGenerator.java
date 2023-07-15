@@ -1,6 +1,5 @@
 package com.example.utils;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
@@ -27,11 +26,20 @@ public class ResponseGenerator {
         response.sendError(404, "This exchange rate does not exist.");
     }
 
-    public void notValidRate() throws IOException {
-        response.sendError(400, "Not a valid rate. Should be like this: 0.4 .");
+    public void invalidRate() throws IOException {
+        response.sendError(400, "Invalid rate. Should be like this: 0.4");
     }
 
     public void rateExists() throws IOException {
         response.sendError(409, "This exchange rate already exist.");
     }
+
+    public void invalidAmount() throws IOException {
+        response.sendError(400, "Invalid amount. Should look like this: 100.0 or 100");
+    }
+
+    public void invalidCode() throws IOException {
+        response.sendError(400, "Invalid currency code. Should look like this: USD, RUB");
+    }
+
 }

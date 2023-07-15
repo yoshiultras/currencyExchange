@@ -48,14 +48,19 @@ public class CurrenciesServlet extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
         request.setCharacterEncoding("UTF-8");
-        String code = request.getParameter("code");
-        String fullName = request.getParameter("fullName");
-        String sign = request.getParameter("sign");
-        if (code.length() != 3 || fullName.length() == 0 || sign.length() == 0) {
-            responseGenerator.notValidCurrency();
-            return;
-        }
+
         try {
+            String code = request.getParameter("code");
+            String fullName = request.getParameter("fullName");
+            String sign = request.getParameter("sign");
+            if (fullName.length() == 0 || sign.length() == 0) {
+                responseGenerator.notValidCurrency();
+                return;
+            }
+            if(code.length() != 3) {
+                responseGenerator.invalidCode();
+                return;
+            }
             if (currencyRepository.exists(code)) {
                 responseGenerator.currencyExists();
                 return;

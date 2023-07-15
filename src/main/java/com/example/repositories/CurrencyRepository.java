@@ -1,6 +1,6 @@
 package com.example.repositories;
 
-import com.example.DataSourceProvider;
+import com.example.utils.DataSourceProvider;
 import com.example.models.Currency;
 
 import javax.sql.DataSource;

@@ -1,6 +1,6 @@
 package com.example.repositories;
 
-import com.example.DataSourceProvider;
+import com.example.utils.DataSourceProvider;
 import com.example.models.Currency;
 import com.example.models.ExchangeRate;
 
@@ -79,7 +79,7 @@ public class ExchangeRateRepository {
         Connection connection = dataSource.getConnection();
 
         PreparedStatement statement = connection.prepareStatement("INSERT INTO exchangeRates (baseCurrencyId, targetCurrencyId, rate) " +
-                "VALUES (" + getCurrencyId(baseCode) + ", " + getCurrencyId(targetCode) + ", ?");
+                "VALUES (" + getCurrencyId(baseCode) + ", " + getCurrencyId(targetCode) + ", ?" + ");");
 
         statement.setDouble(1, rate);
 
@@ -91,7 +91,7 @@ public class ExchangeRateRepository {
         Connection connection = dataSource.getConnection();
 
         PreparedStatement statement = connection.prepareStatement("UPDATE exchangeRates SET rate = ? " +
-                "WHERE baseCurrencyId = " + getCurrencyId(baseCode) +" AND targetCurrencyId = " + getCurrencyId(targetCode) + ";");
+                "WHERE baseCurrencyId = " + getCurrencyId(baseCode) + " AND targetCurrencyId = " + getCurrencyId(targetCode) + ";");
 
         statement.setDouble(1, rate);
 

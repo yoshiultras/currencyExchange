@@ -1,7 +1,9 @@
 package com.example.servlets;
 
-import com.example.models.Currency;
+import com.example.models.Exchange;
 import com.example.repositories.CurrencyRepository;
+import com.example.repositories.ExchangeRateRepository;
+import com.example.services.ExchangeService;
 import com.example.utils.ResponseGenerator;
 import com.google.gson.Gson;
 
@@ -12,45 +14,49 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
-import java.util.Optional;
 
-@WebServlet("/currencies/*")
-public class CurrencyServlet extends HttpServlet {
+@WebServlet("/exchange")
+public class ExchangeServlet extends HttpServlet {
+    ExchangeService exchangeService;
     CurrencyRepository currencyRepository;
+
     @Override
     public void init() {
         try {
+            exchangeService = new ExchangeService();
             currencyRepository = new CurrencyRepository();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
     }
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
-
-        String path = request.getPathInfo();
-        if (path == null || path.length() < 4) {
-            responseGenerator.invalidCode();
-            return;
-        }
-
-        String code = path.replaceFirst("/", "").toUpperCase();
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
         try {
-            Optional<Currency> optional = currencyRepository.getCurrencyByCode(code);
-            if (!optional.isPresent()) {
+            String fromCur = request.getParameter("from");
+            String toCur = request.getParameter("to");
+            double amount = Double.parseDouble(request.getParameter("amount"));
+            if (fromCur.length() != 3 || toCur.length() != 3) {
+                responseGenerator.invalidCode();
+                return;
+            }
+            if (!currencyRepository.exists(fromCur) || !currencyRepository.exists(toCur)) {
                 responseGenerator.currencyNotExists();
                 return;
             }
-            Currency currency = optional.get();
+            Exchange exchange = exchangeService.exchange(fromCur, toCur, amount);
             Gson gson = new Gson();
             PrintWriter out = response.getWriter();
-            out.print(gson.toJson(currency));
+            out.print(gson.toJson(exchange));
             out.flush();
-        } catch (Exception e) {
+        } catch (SQLException e) {
+            System.out.println(e);
             responseGenerator.generalException();
+        } catch (Exception e) {
+            responseGenerator.invalidAmount();
         }
+
     }
+
 }

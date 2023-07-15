@@ -18,11 +18,13 @@ import java.util.List;
 @WebServlet("/exchangeRates")
 public class ExchangeRatesServlet extends HttpServlet {
     ExchangeRateRepository exchangeRateRepository;
+    CurrencyRepository currencyRepository;
 
     @Override
     public void init() {
         try {
             exchangeRateRepository = new ExchangeRateRepository();
+            currencyRepository = new CurrencyRepository();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
         }
@@ -56,7 +58,14 @@ public class ExchangeRatesServlet extends HttpServlet {
             String baseCode = request.getParameter("baseCurrencyCode");
             String targetCode = request.getParameter("targetCurrencyCode");
             double rate = Double.parseDouble(request.getParameter("rate"));
-
+            if (baseCode.length() != 3 || targetCode.length() != 3) {
+                responseGenerator.invalidCode();
+                return;
+            }
+            if (!currencyRepository.exists(baseCode) || !currencyRepository.exists(targetCode)) {
+                responseGenerator.currencyNotExists();
+                return;
+            }
             if (exchangeRateRepository.exists(baseCode, targetCode)) {
                 responseGenerator.rateExists();
                 return;
@@ -68,12 +77,11 @@ public class ExchangeRatesServlet extends HttpServlet {
             PrintWriter out = response.getWriter();
             out.print(gson.toJson(exchangeRate));
             out.flush();
-
-        } catch (ClassCastException e) {
-            responseGenerator.notValidRate();
-        } catch (Exception e) {
+        } catch (SQLException e) {
             System.out.println(e);
             responseGenerator.generalException();
+        } catch (Exception e) {
+            responseGenerator.invalidRate();
         }
     }
 }

@@ -1,21 +1,29 @@
 POST http://localhost:8080/servlets_war_exploded/exchangeRates
 Content-Type:application/x-www-form-urlencoded
 
-baseCurrencyCode=RUB&targetCurrencyCode=EUR&rate=0.09
+baseCurrencyCode=USD&targetCurrencyCode=CAD&rate=1.2
 
 ###
 POST http://localhost:8080/servlets_war_exploded/currencies
 Content-Type:application/x-www-form-urlencoded
 
-code=Bsd&fullName=EURO&sign=BD
+code=USD&fullName=sdf&sign=BD
 
 ###
-PATCH http://localhost:8080/servlets_war_exploded/exchangeRates/USDRUB
+POST http://localhost:8080/servlets_war_exploded/exchangeRates/RUBCAD
 Content-Type:application/x-www-form-urlencoded
 
-rate=0.2
+rate=1
 
 ###
-GET http://localhost:8080/servlets_war_exploded/currencies
+GET http://localhost:8080/servlets_war_exploded/currencies/EUR
 ###
 GET http://localhost:8080/servlets_war_exploded/exchangeRates
+###
+GET http://localhost:8080/servlets_war_exploded/exchange?from=RUB&to=USD&amount=100
+###
+GET http://localhost:8080/servlets_war_exploded/exchange?from=CAD&to=USD&amount=100
+###
+GET http://localhost:8080/servlets_war_exploded/exchange?from=CAD&to=RUB&amount=100
+###
+GET http://localhost:8080/servlets_war_exploded/exchangeRates/RUBUSD
