@@ -30,7 +30,7 @@ public class CurrencyServlet extends HttpServlet {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
 
         String path = request.getPathInfo();
-        if (path == null || path.equals("/")) {
+        if (path == null || path.length() < 4) {
             responseGenerator.currencyNotExists();
             return;
         }
@@ -38,17 +38,17 @@ public class CurrencyServlet extends HttpServlet {
         String code = path.replaceFirst("/", "").toUpperCase();
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        Gson gson = new Gson();
-        PrintWriter out = response.getWriter();
         try {
             Optional<Currency> optional = currencyRepository.getCurrencyByCode(code);
             if (!optional.isPresent()) {
-                System.out.println("sdfds");
                 responseGenerator.currencyNotExists();
                 return;
             }
             Currency currency = optional.get();
+            Gson gson = new Gson();
+            PrintWriter out = response.getWriter();
             out.print(gson.toJson(currency));
+            out.flush();
         } catch (Exception e) {
             responseGenerator.generalException();
         }

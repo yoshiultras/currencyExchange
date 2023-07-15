@@ -32,6 +32,7 @@ public class CurrencyRepository {
             list.add(new Currency(resultSet.getInt("id"), resultSet.getString("code"),
                     resultSet.getString("fullName"), resultSet.getString("sign")));
         }
+        st.close();
         return list;
     }
     public Optional<Currency> getCurrencyByCode(String code) throws SQLException {
@@ -40,18 +41,18 @@ public class CurrencyRepository {
             st.setString(1, code);
             st.execute();
             ResultSet resultSet = st.getResultSet();
-            if (!resultSet.next()) return Optional.empty();
-            return Optional.of(new Currency(resultSet.getInt("id"), resultSet.getString("code"),
+            if (!resultSet.next()) {
+                st.close();
+                return Optional.empty();
+            }
+            Optional<Currency> optional = Optional.of(new Currency(resultSet.getInt("id"), resultSet.getString("code"),
                     resultSet.getString("fullName"), resultSet.getString("sign")));
+            st.close();
+            return optional;
 
     }
     public boolean exists(String code) throws SQLException {
-        Connection con = dataSource.getConnection();
-        PreparedStatement st = con.prepareStatement("SELECT * FROM currencies WHERE code = ?");
-        st.setString(1, code);
-        st.execute();
-        ResultSet resultSet = st.getResultSet();
-        return resultSet.next();
+        return getCurrencyByCode(code).isPresent();
     }
     public Currency addCurrency(Currency currency) throws SQLException {
         Connection con = dataSource.getConnection();
@@ -60,6 +61,7 @@ public class CurrencyRepository {
         st.setString(2, currency.getFullName());
         st.setString(3, currency.getSign());
         st.executeUpdate();
+        st.close();
         return getLastCurrency();
     }
     public Currency getLastCurrency() throws SQLException {
@@ -68,7 +70,9 @@ public class CurrencyRepository {
         st.execute();
         ResultSet resultSet = st.getResultSet();
         resultSet.next();
-        return new Currency(resultSet.getInt("id"), resultSet.getString("code"),
+        Currency currency = new Currency(resultSet.getInt("id"), resultSet.getString("code"),
                 resultSet.getString("fullName"), resultSet.getString("sign"));
+        st.close();
+        return currency;
     }
 }

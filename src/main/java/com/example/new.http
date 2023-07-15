@@ -1,4 +1,15 @@
-GET http://localhost:8080/servlets_war_exploded/currencies/usf
-#Content-Type:application/x-www-form-urlencoded
-#
-#code=ASD&fullName=AUSTRALIAN DOLLAR&sign=A$
+POST http://localhost:8080/servlets_war_exploded/exchangeRates
+Content-Type:application/x-www-form-urlencoded
+
+baseCurrencyCode=RUB&targetCurrencyCode=EUR&rate=0.09
+
+###
+POST http://localhost:8080/servlets_war_exploded/currencies
+Content-Type:application/x-www-form-urlencoded
+
+code=Bsd&fullName=EURO&sign=BD
+
+###
+GET http://localhost:8080/servlets_war_exploded/currencies
+###
+GET http://localhost:8080/servlets_war_exploded/exchangeRates

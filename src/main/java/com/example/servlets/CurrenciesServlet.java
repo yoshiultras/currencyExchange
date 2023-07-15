@@ -31,13 +31,14 @@ public class CurrenciesServlet extends HttpServlet {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        Gson gson = new Gson();
-        PrintWriter out = response.getWriter();
         try {
             List<Currency> list = currencyRepository.getCurrencies();
+            Gson gson = new Gson();
+            PrintWriter out = response.getWriter();
             for (Currency currency : list) {
                 out.print(gson.toJson(currency));
             }
+            out.flush();
         } catch (SQLException e) {
             responseGenerator.generalException();
         }
@@ -64,6 +65,7 @@ public class CurrenciesServlet extends HttpServlet {
             Gson gson = new Gson();
             PrintWriter out = response.getWriter();
             out.print(gson.toJson(newCurrency));
+            out.flush();
         } catch (SQLException e) {
             responseGenerator.generalException();
         }

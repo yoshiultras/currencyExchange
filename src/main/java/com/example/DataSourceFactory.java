@@ -8,24 +8,28 @@ import java.net.URISyntaxException;
 import java.net.URL;
 
 public class DataSourceFactory {
-    private static DataSourceFactory INSTANCE;
+    private static DataSourceFactory instance;
+    private static DataSource dataSourceInstance;
 
     public static DataSourceFactory getInstance() {
-        if (INSTANCE == null) {
-            INSTANCE = new DataSourceFactory();
+        if (instance == null) {
+            instance = new DataSourceFactory();
         }
-        return INSTANCE;
+        return instance;
     }
     public DataSourceFactory() {
     }
     public DataSource getDataSource() throws URISyntaxException {
-        URL resource = DataSourceFactory.class.getClassLoader().getResource("currencyExchange.db");
-        String path = null;
-        if (resource != null) {
-            path = new File(resource.toURI()).getAbsolutePath();
+        if (dataSourceInstance == null) {
+            URL resource = DataSourceFactory.class.getClassLoader().getResource("currencyExchange.db");
+            String path = null;
+            if (resource != null) {
+                path = new File(resource.toURI()).getAbsolutePath();
+            }
+            SQLiteDataSource dataSource = new SQLiteDataSource();
+            dataSource.setUrl(String.format("jdbc:sqlite:%s", path));
+            dataSourceInstance = dataSource;
         }
-        SQLiteDataSource sqLiteDataSource = new SQLiteDataSource();
-        sqLiteDataSource.setUrl(String.format("jdbc:sqlite:%s", path));
-        return sqLiteDataSource;
+        return dataSourceInstance;
     }
 }

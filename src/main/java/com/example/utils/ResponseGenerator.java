@@ -22,4 +22,16 @@ public class ResponseGenerator {
     public void currencyNotExists() throws IOException {
         response.sendError(404, "This currency does not exist.");
     }
+
+    public void rateNotExists() throws IOException {
+        response.sendError(404, "This exchange rate does not exist.");
+    }
+
+    public void notValidRate() throws IOException {
+        response.sendError(400, "Not a valid rate. Should be like this: 0.4 .");
+    }
+
+    public void rateExists() throws IOException {
+        response.sendError(409, "This exchange rate already exist.");
+    }
 }

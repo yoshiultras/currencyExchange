@@ -1,6 +1,7 @@
 package com.example.servlets;
 
 import com.example.models.ExchangeRate;
+import com.example.repositories.CurrencyRepository;
 import com.example.repositories.ExchangeRateRepository;
 import com.example.utils.ResponseGenerator;
 import com.google.gson.Gson;
@@ -32,13 +33,15 @@ public class ExchangeRatesServlet extends HttpServlet {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
         response.setContentType("application/json");
         response.setCharacterEncoding("UTF-8");
-        Gson gson = new Gson();
-        PrintWriter out = response.getWriter();
+
         try {
             List<ExchangeRate> list = exchangeRateRepository.getRates();
+            Gson gson = new Gson();
+            PrintWriter out = response.getWriter();
             for (ExchangeRate exchangeRate : list) {
                 out.print(gson.toJson(exchangeRate));
             }
+            out.flush();
         } catch (SQLException e) {
             responseGenerator.generalException();
         }
@@ -46,6 +49,31 @@ public class ExchangeRatesServlet extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        ResponseGenerator responseGenerator = new ResponseGenerator(response);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        try {
+            String baseCode = request.getParameter("baseCurrencyCode");
+            String targetCode = request.getParameter("targetCurrencyCode");
+            double rate = Double.parseDouble(request.getParameter("rate"));
 
+            if (exchangeRateRepository.exists(baseCode, targetCode)) {
+                responseGenerator.rateExists();
+                return;
+            }
+
+            ExchangeRate exchangeRate = exchangeRateRepository.addRate(baseCode, targetCode, rate);
+
+            Gson gson = new Gson();
+            PrintWriter out = response.getWriter();
+            out.print(gson.toJson(exchangeRate));
+            out.flush();
+
+        } catch (ClassCastException e) {
+            responseGenerator.notValidRate();
+        } catch (Exception e) {
+            System.out.println(e);
+            responseGenerator.generalException();
+        }
     }
 }

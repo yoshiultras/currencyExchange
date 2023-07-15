@@ -12,6 +12,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class ExchangeRateRepository {
     DataSourceFactory dataSourceFactory;
@@ -25,19 +26,72 @@ public class ExchangeRateRepository {
     public List<ExchangeRate> getRates() throws SQLException {
         List<ExchangeRate> list = new ArrayList<>();
         Connection connection = dataSource.getConnection();
+
         PreparedStatement statement = connection.prepareStatement("SELECT ex.id AS exid, b.id AS bid, b.code AS bcode, b.fullName AS bfullName, b.sign AS bsign, " +
                 "t.id AS tid, t.code AS tcode, t.fullName AS tfullName, t.sign AS tsign, ex.rate AS exrate FROM exchangeRates AS ex " +
                 "JOIN currencies AS b ON ex.baseCurrencyId = b.id " +
                 "JOIN currencies AS t ON ex.targetCurrencyId = t.id;");
+
         ResultSet resultSet = statement.executeQuery();
+
         while (resultSet.next()) {
             Currency base = new Currency(resultSet.getInt("bid"), resultSet.getString("bcode"),
                     resultSet.getString("bfullName"), resultSet.getString("bsign"));
+
             Currency target = new Currency(resultSet.getInt("tid"), resultSet.getString("tcode"),
                     resultSet.getString("tfullName"), resultSet.getString("tsign"));
+
             ExchangeRate exchangeRate = new ExchangeRate(resultSet.getInt("exid"), base, target, resultSet.getDouble("exrate"));
             list.add(exchangeRate);
         }
+        statement.close();
         return list;
+    }
+    public Optional<ExchangeRate> getRate(String baseCode, String targetCode) throws SQLException {
+        Connection connection = dataSource.getConnection();
+
+        PreparedStatement statement = connection.prepareStatement("SELECT ex.id AS exid, b.id AS bid, b.code AS bcode, b.fullName AS bfullName, b.sign AS bsign, " +
+                "t.id AS tid, t.code AS tcode, t.fullName AS tfullName, t.sign AS tsign, ex.rate AS exrate FROM exchangeRates AS ex " +
+                "JOIN currencies AS b ON ex.baseCurrencyId = b.id " +
+                "JOIN currencies AS t ON ex.targetCurrencyId = t.id WHERE bcode = ? AND tcode = ?;");
+
+        statement.setString(1, baseCode);
+        statement.setString(2, targetCode);
+        ResultSet resultSet = statement.executeQuery();
+
+        if (!resultSet.next()) return Optional.empty();
+
+        Currency base = new Currency(resultSet.getInt("bid"), resultSet.getString("bcode"),
+                resultSet.getString("bfullName"), resultSet.getString("bsign"));
+
+        Currency target = new Currency(resultSet.getInt("tid"), resultSet.getString("tcode"),
+                resultSet.getString("tfullName"), resultSet.getString("tsign"));
+        Optional<ExchangeRate> optional = Optional.of(new ExchangeRate(resultSet.getInt("exid"), base, target, resultSet.getDouble("exrate")));
+        statement.close();
+        return optional;
+    }
+
+    public boolean exists(String baseCode, String targetCode) throws SQLException {
+        return getRate(baseCode, targetCode).isPresent();
+    }
+
+    public ExchangeRate addRate(String baseCode, String targetCode, double rate) throws SQLException {
+        Connection connection = dataSource.getConnection();
+
+        PreparedStatement statement = connection.prepareStatement("INSERT INTO exchangeRates (baseCurrencyId, targetCurrencyId, rate) " +
+                "SELECT b.id, t.id, ? FROM currencies AS b JOIN currencies AS t WHERE b.code = ? AND t.code = ?;");
+
+        statement.setDouble(1, rate);
+        statement.setString(2, baseCode);
+        statement.setString(3, targetCode);
+
+        statement.executeUpdate();
+        statement.close();
+        return lastRate();
+    }
+
+    private ExchangeRate lastRate() throws SQLException {
+        List<ExchangeRate> list = getRates();
+        return list.get(list.size() - 1);
     }
 }
