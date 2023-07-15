@@ -1,6 +1,6 @@
 package com.example.repositories;
 
-import com.example.DataSourceFactory;
+import com.example.DataSourceProvider;
 import com.example.models.Currency;
 import com.example.models.ExchangeRate;
 
@@ -15,12 +15,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class ExchangeRateRepository {
-    DataSourceFactory dataSourceFactory;
+    DataSourceProvider dataSourceProvider;
     DataSource dataSource;
 
     public ExchangeRateRepository() throws URISyntaxException {
-        dataSourceFactory = DataSourceFactory.getInstance();
-        dataSource = dataSourceFactory.getDataSource();
+        dataSourceProvider = DataSourceProvider.getInstance();
+        dataSource = dataSourceProvider.getDataSource();
     }
 
     public List<ExchangeRate> getRates() throws SQLException {
@@ -79,19 +79,35 @@ public class ExchangeRateRepository {
         Connection connection = dataSource.getConnection();
 
         PreparedStatement statement = connection.prepareStatement("INSERT INTO exchangeRates (baseCurrencyId, targetCurrencyId, rate) " +
-                "SELECT b.id, t.id, ? FROM currencies AS b JOIN currencies AS t WHERE b.code = ? AND t.code = ?;");
+                "VALUES (" + getCurrencyId(baseCode) + ", " + getCurrencyId(targetCode) + ", ?");
 
         statement.setDouble(1, rate);
-        statement.setString(2, baseCode);
-        statement.setString(3, targetCode);
 
         statement.executeUpdate();
         statement.close();
-        return lastRate();
+        return getRate(baseCode, targetCode).get();
+    }
+    public ExchangeRate updateRate(String baseCode, String targetCode, double rate) throws SQLException {
+        Connection connection = dataSource.getConnection();
+
+        PreparedStatement statement = connection.prepareStatement("UPDATE exchangeRates SET rate = ? " +
+                "WHERE baseCurrencyId = " + getCurrencyId(baseCode) +" AND targetCurrencyId = " + getCurrencyId(targetCode) + ";");
+
+        statement.setDouble(1, rate);
+
+        statement.executeUpdate();
+        statement.close();
+        return getRate(baseCode, targetCode).get();
+    }
+    private int getCurrencyId(String code) throws SQLException {
+        Connection connection = dataSource.getConnection();
+        PreparedStatement statement = connection.prepareStatement("SELECT id FROM currencies WHERE code = ?");
+        statement.setString(1, code);
+        ResultSet resultSet = statement.executeQuery();
+        resultSet.next();
+        int id = resultSet.getInt("id");
+        statement.close();
+        return id;
     }
 
-    private ExchangeRate lastRate() throws SQLException {
-        List<ExchangeRate> list = getRates();
-        return list.get(list.size() - 1);
-    }
 }

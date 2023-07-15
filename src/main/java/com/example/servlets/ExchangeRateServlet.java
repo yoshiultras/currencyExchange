@@ -12,6 +12,8 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.net.URISyntaxException;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Map;
 import java.util.Optional;
 
 @WebServlet("/exchangeRates/*")
@@ -24,6 +26,49 @@ public class ExchangeRateServlet extends HttpServlet {
             exchangeRateRepository = new ExchangeRateRepository();
         } catch (URISyntaxException e) {
             throw new RuntimeException(e);
+        }
+    }
+
+//    @Override
+//    public void service(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+//        if (request.getMethod().equalsIgnoreCase("PATCH")){
+//            doPatch(request, response);
+//        } else {
+//            super.service(request, response);
+//        }
+//    }
+
+    //Вместо PATCH
+    @Override
+    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        ResponseGenerator responseGenerator = new ResponseGenerator(response);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        try {
+            Map<String, String[]> map = request.getParameterMap();
+            System.out.println(Arrays.toString(map.get("rate")));
+            double rate = Double.parseDouble(request.getParameter("rate"));
+            String path = request.getPathInfo();
+            System.out.println(path);
+            if (path == null || path.length() < 7) {
+                responseGenerator.rateNotExists();
+                return;
+            }
+            path = path.replaceFirst("/", "");
+            String baseCode = path.substring(0,3).toUpperCase();
+            String targetCode = path.substring(3,6).toUpperCase();
+
+            ExchangeRate exchangeRate = exchangeRateRepository.updateRate(baseCode, targetCode, rate);
+            Gson gson = new Gson();
+            PrintWriter out = response.getWriter();
+            out.print(gson.toJson(exchangeRate));
+            out.flush();
+
+        } catch (ClassCastException | NullPointerException e) {
+            responseGenerator.notValidRate();
+        } catch (Exception e) {
+            System.out.println(e);
+            responseGenerator.generalException();
         }
     }
 
@@ -60,8 +105,4 @@ public class ExchangeRateServlet extends HttpServlet {
         }
     }
 
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-
-    }
 }

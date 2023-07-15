@@ -10,6 +10,12 @@ Content-Type:application/x-www-form-urlencoded
 code=Bsd&fullName=EURO&sign=BD
 
 ###
+POST http://localhost:8080/servlets_war_exploded/exchangeRates/USDRUB
+Content-Type:application/x-www-form-urlencoded
+
+rate=0.01
+
+###
 GET http://localhost:8080/servlets_war_exploded/currencies
 ###
 GET http://localhost:8080/servlets_war_exploded/exchangeRates

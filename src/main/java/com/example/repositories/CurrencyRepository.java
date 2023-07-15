@@ -1,6 +1,6 @@
 package com.example.repositories;
 
-import com.example.DataSourceFactory;
+import com.example.DataSourceProvider;
 import com.example.models.Currency;
 
 import javax.sql.DataSource;
@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Optional;
 
 public class CurrencyRepository {
-    private DataSourceFactory dataSourceFactory;
+    private DataSourceProvider dataSourceProvider;
     private DataSource dataSource;
 
     public CurrencyRepository() throws URISyntaxException {
-        dataSourceFactory = DataSourceFactory.getInstance();
-        dataSource = dataSourceFactory.getDataSource();
+        dataSourceProvider = DataSourceProvider.getInstance();
+        dataSource = dataSourceProvider.getDataSource();
     }
 
     public List<Currency> getCurrencies() throws SQLException {
@@ -62,17 +62,6 @@ public class CurrencyRepository {
         st.setString(3, currency.getSign());
         st.executeUpdate();
         st.close();
-        return getLastCurrency();
-    }
-    public Currency getLastCurrency() throws SQLException {
-        Connection con = dataSource.getConnection();
-        PreparedStatement st = con.prepareStatement("SELECT * FROM currencies ORDER BY id DESC LIMIT 1");
-        st.execute();
-        ResultSet resultSet = st.getResultSet();
-        resultSet.next();
-        Currency currency = new Currency(resultSet.getInt("id"), resultSet.getString("code"),
-                resultSet.getString("fullName"), resultSet.getString("sign"));
-        st.close();
-        return currency;
+        return getCurrencyByCode(currency.getCode()).get();
     }
 }
