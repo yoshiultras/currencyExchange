@@ -56,6 +56,10 @@ public class ExchangeRatesServlet extends HttpServlet {
             String baseCode = request.getParameter("baseCurrencyCode");
             String targetCode = request.getParameter("targetCurrencyCode");
             double rate = Double.parseDouble(request.getParameter("rate"));
+            if (baseCode == null || targetCode == null) {
+                responseGenerator.invalidCode();
+                return;
+            }
             if (baseCode.length() != 3 || targetCode.length() != 3) {
                 responseGenerator.invalidCode();
                 return;

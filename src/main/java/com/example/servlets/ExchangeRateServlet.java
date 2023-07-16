@@ -74,7 +74,7 @@ public class ExchangeRateServlet extends HttpServlet {
 
     //Вместо PATCH
     @Override
-    public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
+    public void doPut(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
         response.addHeader("Content-Type", "application/json;charset=UTF-8");
         try {

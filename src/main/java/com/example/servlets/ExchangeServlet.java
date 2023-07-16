@@ -37,6 +37,10 @@ public class ExchangeServlet extends HttpServlet {
             String fromCur = request.getParameter("from");
             String toCur = request.getParameter("to");
             double amount = Double.parseDouble(request.getParameter("amount"));
+            if (fromCur == null || toCur == null) {
+                responseGenerator.invalidCode();
+                return;
+            }
             if (fromCur.length() != 3 || toCur.length() != 3) {
                 responseGenerator.invalidCode();
                 return;
