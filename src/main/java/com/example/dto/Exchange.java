@@ -1,5 +1,6 @@
-package com.example.models;
+package com.example.dto;
 
+import com.example.models.Currency;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;

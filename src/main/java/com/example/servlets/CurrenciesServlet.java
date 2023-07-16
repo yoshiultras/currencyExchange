@@ -29,8 +29,7 @@ public class CurrenciesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        response.addHeader("Content-Type", "application/json;charset=UTF-8");
         try {
             List<Currency> list = currencyRepository.getCurrencies();
             Gson gson = new Gson();

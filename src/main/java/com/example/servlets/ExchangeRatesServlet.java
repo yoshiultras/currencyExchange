@@ -33,8 +33,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        response.addHeader("Content-Type", "application/json;charset=UTF-8");
 
         try {
             List<ExchangeRate> list = exchangeRateRepository.getRates();
@@ -52,8 +51,7 @@ public class ExchangeRatesServlet extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        response.addHeader("Content-Type", "application/json;charset=UTF-8");
         try {
             String baseCode = request.getParameter("baseCurrencyCode");
             String targetCode = request.getParameter("targetCurrencyCode");

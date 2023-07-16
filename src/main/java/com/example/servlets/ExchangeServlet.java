@@ -1,8 +1,7 @@
 package com.example.servlets;
 
-import com.example.models.Exchange;
+import com.example.dto.Exchange;
 import com.example.repositories.CurrencyRepository;
-import com.example.repositories.ExchangeRateRepository;
 import com.example.services.ExchangeService;
 import com.example.utils.ResponseGenerator;
 import com.google.gson.Gson;
@@ -33,6 +32,7 @@ public class ExchangeServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
+        response.addHeader("Content-Type", "application/json;charset=UTF-8");
         try {
             String fromCur = request.getParameter("from");
             String toCur = request.getParameter("to");

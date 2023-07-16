@@ -36,8 +36,7 @@ public class CurrencyServlet extends HttpServlet {
         }
 
         String code = path.replaceFirst("/", "").toUpperCase();
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        response.addHeader("Content-Type", "application/json;charset=UTF-8");
         try {
             Optional<Currency> optional = currencyRepository.getCurrencyByCode(code);
             if (!optional.isPresent()) {

@@ -79,9 +79,11 @@ public class ExchangeRateRepository {
         Connection connection = dataSource.getConnection();
 
         PreparedStatement statement = connection.prepareStatement("INSERT INTO exchangeRates (baseCurrencyId, targetCurrencyId, rate) " +
-                "VALUES (" + getCurrencyId(baseCode) + ", " + getCurrencyId(targetCode) + ", ?" + ");");
+                "VALUES ((SELECT id FROM currencies WHERE code = ?), (SELECT id FROM currencies WHERE code = ?), ?);");
 
-        statement.setDouble(1, rate);
+        statement.setString(1, baseCode);
+        statement.setString(2, targetCode);
+        statement.setDouble(3, rate);
 
         statement.executeUpdate();
         statement.close();
@@ -91,23 +93,14 @@ public class ExchangeRateRepository {
         Connection connection = dataSource.getConnection();
 
         PreparedStatement statement = connection.prepareStatement("UPDATE exchangeRates SET rate = ? " +
-                "WHERE baseCurrencyId = " + getCurrencyId(baseCode) + " AND targetCurrencyId = " + getCurrencyId(targetCode) + ";");
+                "WHERE baseCurrencyId = (SELECT id FROM currencies WHERE code = ?) AND targetCurrencyId = (SELECT id FROM currencies WHERE code = ?);");
 
         statement.setDouble(1, rate);
+        statement.setString(2, baseCode);
+        statement.setString(3, targetCode);
 
         statement.executeUpdate();
         statement.close();
         return getRate(baseCode, targetCode).get();
     }
-    private int getCurrencyId(String code) throws SQLException {
-        Connection connection = dataSource.getConnection();
-        PreparedStatement statement = connection.prepareStatement("SELECT id FROM currencies WHERE code = ?");
-        statement.setString(1, code);
-        ResultSet resultSet = statement.executeQuery();
-        resultSet.next();
-        int id = resultSet.getInt("id");
-        statement.close();
-        return id;
-    }
-
 }

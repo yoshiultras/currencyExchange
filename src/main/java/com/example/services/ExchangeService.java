@@ -1,6 +1,6 @@
 package com.example.services;
 
-import com.example.models.Exchange;
+import com.example.dto.Exchange;
 import com.example.models.ExchangeRate;
 import com.example.repositories.CurrencyRepository;
 import com.example.repositories.ExchangeRateRepository;

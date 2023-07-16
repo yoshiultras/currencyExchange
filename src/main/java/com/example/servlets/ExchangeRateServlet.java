@@ -42,12 +42,12 @@ public class ExchangeRateServlet extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
-
         String path = request.getPathInfo();
         if (path == null || path.length() < 7) {
             responseGenerator.invalidCode();
             return;
         }
+        response.addHeader("Content-Type", "application/json;charset=UTF-8");
         path = path.replaceFirst("/", "");
         String baseCode = path.substring(0,3).toUpperCase();
         String targetCode = path.substring(3,6).toUpperCase();
@@ -76,8 +76,7 @@ public class ExchangeRateServlet extends HttpServlet {
     @Override
     public void doPost(HttpServletRequest request, HttpServletResponse response) throws IOException {
         ResponseGenerator responseGenerator = new ResponseGenerator(response);
-        response.setContentType("application/json");
-        response.setCharacterEncoding("UTF-8");
+        response.addHeader("Content-Type", "application/json;charset=UTF-8");
         try {
             double rate = Double.parseDouble(request.getParameter("rate"));
             String path = request.getPathInfo();
